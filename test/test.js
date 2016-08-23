@@ -40,7 +40,6 @@ test('create dummy addon', t => {
 test('get addons from addons.json', t => {
   t.plan(1)
   addonManager.listAddons(addons => {
-    console.log(addons, ' installed addons')
     t.ok(addons.length >= 1,'atleast one addon found' )
   })
 })
