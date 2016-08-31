@@ -101,3 +101,27 @@ test('search for addons that doesnt exist', t => {
     })
   })
 })
+
+
+test('check for updates', t => {
+  t.plan(2)
+
+
+  portals['curse'].search('bagnon', (err, res) => {
+    portals['curse'].getAddonInfo(res[0], (err, info) => {
+      addonManager.installAddon(info, (err, folders) => {
+
+        addonManager.listAddons(addons => {
+          addonManager.checkForAddonUpdate(addons[0], (err, versionInfo) => {
+            console.log(versionInfo, ' version information')
+            t.error(err, 'check for update didnt crash. good')
+            addonManager.deleteAddon(info.name, err => {
+              t.error(err, ' deleting' + info.name + ' worked')
+            })
+          })
+        })
+      })
+    })
+  })
+
+})
