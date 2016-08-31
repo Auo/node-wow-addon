@@ -86,3 +86,18 @@ test('get addon information from wowinterface', t => {
     })
   })
 })
+
+test('search for addons that doesnt exist', t => {
+  t.plan(4)
+
+  portals['wowinterface'].search('I-dont-think-this-name-exists', (err, res) => {
+    t.error(err, 'searching for none existing worked')
+    t.ok(res.length == 0, ' no packages found, good')
+
+
+    portals['curse'].search('I-dont-think-this-name-exists', (err, res) => {
+      t.error(err, 'searching for none existing worked')
+      t.ok(res.length == 0, ' no packages found, good')
+    })
+  })
+})
