@@ -1,8 +1,7 @@
 ## node-wow-addon
 A node-module to install addons for World of Warcraft.
 
-
-
+I'm not in any way affiliated with Blizzard or World of Warcraft!
 
 ### features
 using the portals wowinterface and curse
@@ -12,6 +11,8 @@ using the portals wowinterface and curse
 * Keeping track of addons
 
 
+
+### example code
 ```javascript
 const manager = request('node-wow-addon')('path-to-folder-for-installation')
 
@@ -20,7 +21,8 @@ manager.portals.ONEPORTALNAME.search('name', (err, searchResults) => {
   //returns an array of search items from specified portal.
   })
 manager.portals.ONEPORTALNAME.getAddonInfo(searchResultItem, (err, info) => {
-  //takes a search item and retrieves more information, can also take an item from the addons.json file manager.listAddons()
+  //takes a search item and retrieves more information
+  //you can also take an item from manager.listAddons()
   })
 
 manager.listAddons(addons => {
@@ -40,11 +42,17 @@ manager.deleteAddon('name', err => {
  //tries to uninstall an addon based on its name. if it is not found, and error will be returned
   })
 
+manager.checkForAddonUpdate(info, (err, versionInfo) => {
+  //info is from the listAddons function.
+  //example return {newVersionAvailable: true, localVerson: '1.0', portalVersion: '2.0'}
+  //if newVersionAvailable just install addon again, it will overwrite previous.
+})
+
 ```
 
 
 
 ### todo
-* scan addon-folder for installed addons ( difficult since the titles of the addons are not the same as on the portals ( doesn't have to be ))
-* filter away addon-packs on wowinterface.( the addon-packs will not be installed correctly, maybe let the user decide upon this?)
-* filter away addon-packs on curse ( doesn't seem to be any when you don't use the client)
+* scan addon-folder for installed addons
+* filter away addon-packs on wowinterface
+* filter away addon-packs on curse
