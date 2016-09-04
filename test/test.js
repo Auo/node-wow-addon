@@ -52,9 +52,10 @@ test('delete addon', t => {
 })
 
 test('get addon information from curse', t => {
-  t.plan(6)
+  t.plan(7)
 
   portals['curse'].search('bagnon', (err, res) => {
+    t.ok(typeof res[0].downloads === 'number', 'downloads is a number')
     t.error(err, ' searching for addone worked')
     t.ok(res.length > 0, ' atleast one search result')
     portals['curse'].getAddonInfo(res[0], (err, info) => {
@@ -69,8 +70,9 @@ test('get addon information from curse', t => {
 })
 
 test('get addon information from wowinterface', t => {
-  t.plan(7)
+  t.plan(8)
   portals['wowinterface'].search('bagnon', (err, res) => {
+    t.ok(typeof res[0].downloads === 'number', 'downloads is a number')
     t.error(err, ' searching for addone worked')
     t.ok(res.length > 0, ' atleast one search result')
     portals['wowinterface'].getAddonInfo(res[0], (err, info) => {
@@ -93,8 +95,6 @@ test('search for addons that doesnt exist', t => {
   portals['wowinterface'].search('I-dont-think-this-name-exists', (err, res) => {
     t.error(err, 'searching for none existing worked')
     t.ok(res.length == 0, ' no packages found, good')
-
-
     portals['curse'].search('I-dont-think-this-name-exists', (err, res) => {
       t.error(err, 'searching for none existing worked')
       t.ok(res.length == 0, ' no packages found, good')
@@ -106,14 +106,11 @@ test('search for addons that doesnt exist', t => {
 test('check for updates', t => {
   t.plan(2)
 
-
   portals['curse'].search('bagnon', (err, res) => {
     portals['curse'].getAddonInfo(res[0], (err, info) => {
       addonManager.installAddon(info, (err, folders) => {
-
         addonManager.listAddons(addons => {
           addonManager.checkForAddonUpdate(addons[0], (err, versionInfo) => {
-            console.log(versionInfo, ' version information')
             t.error(err, 'check for update didnt crash. good')
             addonManager.deleteAddon(info.name, err => {
               t.error(err, ' deleting' + info.name + ' worked')

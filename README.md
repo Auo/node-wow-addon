@@ -8,7 +8,6 @@ using the portals wowinterface and curse
 * Searching for addons
 * Installing addons
 * Updating addons
-* Keeping track of addons
 
 
 
@@ -47,7 +46,6 @@ manager.checkForAddonUpdate(info, (err, versionInfo) => {
   //example return {newVersionAvailable: true, localVerson: '1.0', portalVersion: '2.0'}
   //if newVersionAvailable just install addon again, it will overwrite previous.
 })
-
 ```
 
 
