@@ -52,5 +52,4 @@ manager.checkForAddonUpdate(info, (err, versionInfo) => {
 
 ### todo
 * scan addon-folder for installed addons
-* filter away addon-packs on wowinterface
-* filter away addon-packs on curse
+* add method to extract description and images ( getAddonDescription(info, cb))
