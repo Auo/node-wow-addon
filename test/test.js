@@ -51,6 +51,19 @@ test('delete addon', t => {
   })
 })
 
+test('install .rar addon', t=> {
+  t.plan(1)
+  portals['wowinterface'].search('motig', (err, res) => {
+    const addon = res.filter(a => {return a.name == '!8ball' })[0]
+
+    portals['wowinterface'].getAddonInfo(addon, (err, info) => {
+      addonManager.installAddon(info, (err, folders) => {
+        t.error(err, ' installing addons worked')
+      })
+    })
+  })
+})
+
 test('get addon information from curse', t => {
   t.plan(7)
 

@@ -52,4 +52,4 @@ manager.checkForAddonUpdate(info, (err, versionInfo) => {
 
 ### todo
 * scan addon-folder for installed addons
-* add method to extract description and images ( getAddonDescription(info, cb))
+* clean-up zip and rar handling when installing.
