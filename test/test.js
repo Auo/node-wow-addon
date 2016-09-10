@@ -12,22 +12,33 @@ test('sending null path', t => {
     t.throws(() => addons(), 'installation path is empty or wrong type')
 })
 
-test('wowinterface direct hit', t=> {
-  t.plan(3)
+test('wowinterface direct hit', t => {
+  t.plan(5)
 
   portals['wowinterface'].search('!8ball',(err, res) => {
     t.ok(res != undefined && res.length == 1, ' there was ONE match')
     t.error(err, ' no error occured')
     t.ok(typeof res[0].downloads === 'number' && res[0].downloads > 0, ' downloads is a number that is greater than zero')
+
+    portals['wowinterface'].getAddonInfo(res[0], (err, info) => {
+      addonManager.installAddon(info, (err, folders) => {
+        t.error(err, ' installation worked')
+        addonManager.deleteAddon(info.name, err => {
+          t.error(err, ' delete worked')
+        })
+      })
+    })
   })
+
 })
 
 test('testing search curse', t => {
-  t.plan(2)
+  t.plan(3)
 
   portals['curse'].search('deadly', (err, res) => {
     t.ok(res.length > 0, ' atleast some search results were found')
     t.error(err, ' no error returned from search')
+    t.ok(typeof res[0].downloads === 'number' && res[0].downloads > 0, ' downloads is a number that is greater than zero')
   })
 })
 
