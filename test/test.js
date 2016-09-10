@@ -12,6 +12,16 @@ test('sending null path', t => {
     t.throws(() => addons(), 'installation path is empty or wrong type')
 })
 
+test('wowinterface direct hit', t=> {
+  t.plan(3)
+
+  portals['wowinterface'].search('!8ball',(err, res) => {
+    t.ok(res != undefined && res.length == 1, ' there was ONE match')
+    t.error(err, ' no error occured')
+    t.ok(typeof res[0].downloads === 'number' && res[0].downloads > 0, ' downloads is a number that is greater than zero')
+  })
+})
+
 test('testing search curse', t => {
   t.plan(2)
 
