@@ -12,6 +12,8 @@ test('sending null path', t => {
     t.throws(() => addons(), 'installation path is empty or wrong type')
 })
 
+
+
 test('wowinterface direct hit', t => {
   t.plan(5)
 
@@ -123,19 +125,23 @@ test('get addon information from wowinterface', t => {
   })
 })
 
-test('search for addons that doesnt exist', t => {
-  t.plan(4)
+test('search for addons that doesnt exist wowinterface', t => {
+  t.plan(2)
 
   portals['wowinterface'].search('I-dont-think-this-name-exists', (err, res) => {
     t.error(err, 'searching for none existing worked')
     t.ok(res.length == 0, ' no packages found, good')
-    portals['curse'].search('I-dont-think-this-name-exists', (err, res) => {
-      t.error(err, 'searching for none existing worked')
-      t.ok(res.length == 0, ' no packages found, good')
-    })
+
   })
 })
 
+test('search for addons that doesnt exist curse', t => {
+  t.plan(2)
+  portals['curse'].search('I-dont-think-this-name-exists', (err, res) => {
+    t.error(err, 'searching for none existing worked')
+    t.ok(res.length == 0, ' no packages found, good')
+  })
+})
 
 test('check for updates', t => {
   t.plan(2)
@@ -154,5 +160,15 @@ test('check for updates', t => {
       })
     })
   })
+})
 
+
+test('scan addon folder', t => {
+  t.plan(3)
+
+    addonManager.scanAddonFolder((err, result) => {
+      t.error(err, ' scanning didnt crash')
+      t.ok(result.installed != undefined, ' addons was defined')
+      t.ok(result.unmatched != undefined, ' unmatched addons was defined')
+    })
 })

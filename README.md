@@ -8,6 +8,7 @@ using the portals wowinterface and curse
 * Searching for addons
 * Installing addons
 * Updating addons
+* Scanning current addon folder
 
 
 
@@ -51,5 +52,4 @@ manager.checkForAddonUpdate(info, (err, versionInfo) => {
 
 
 ### todo
-* scan addon-folder for installed addons
-* clean-up zip and rar handling when installing.
+* Cleanup and restructuring of code
