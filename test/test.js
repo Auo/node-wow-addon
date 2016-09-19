@@ -1,9 +1,9 @@
 'use strict'
 const test = require('tape')
-const addons = require('../lib/index.js')
+const addons = require('../index.js')
 const path = require('path')
 const portals = require('../lib/sources')
-const addonRoot = './test/mock/'
+const addonRoot = path.join(__dirname, 'mock')
 const addonManager = addons(addonRoot)
 
 test('sending null path', t => {
