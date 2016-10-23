@@ -12,7 +12,22 @@ test('sending null path', t => {
     t.throws(() => addons(), 'installation path is empty or wrong type')
 })
 
+test('get categories from wowinterface', t => {
+  t.plan(2)
 
+  portals['wowinterface'].getCategories((err,categories) => {
+    t.error(err, ' get category worked')
+    t.ok(categories.length > 0, ' alteast one category returned')
+  })
+})
+
+test('get categories from curse', t => {
+  t.plan(2)
+  portals['curse'].getCategories((err, categories) => {
+    t.error(err, ' get category worked')
+    t.ok(categories.length > 0, ' alteast one category returned')
+  })
+})
 
 test('wowinterface direct hit', t => {
   t.plan(5)
