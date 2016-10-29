@@ -46,23 +46,25 @@ test('get category addons from curse', t => {
   })
 })
 
-// test('get category addons from wowinterface', t => {
-//   t.plan(4)
-//   portals['wowinterface'].getCategories((err, categories) => {
-//     portals['wowinterface'].getAddonsFromCategory(categories[0], (errAddons, addons) => {
-//       t.error(errAddons, ' get category worked')
-//       t.ok(addons.length > 0, ' alteast one category returned')
+test('get category addons from wowinterface', t => {
+  t.plan(4)
+  portals['wowinterface'].getCategories((err, categories) => {
+    console.log(categories[0])
+    portals['wowinterface'].getAddonsFromCategory(categories[0], (errAddons, addons) => {
+      t.error(errAddons, ' get category worked')
+      t.ok(addons.length > 0, ' alteast one category returned')
 
-//       portals['wowinterface'].getAddonInfo(addons[0], (err, info) => {
-//         t.error(err, ' getting addon worked')
-//         addonManager.installAddon(info, (err, folders) => {
-//           t.error(err, ' installing addons worked')
-//         })
-//       })
-//     })
-//   })
-// })
+      portals['wowinterface'].getAddonInfo(addons[0], (err, info) => {
+        t.error(err, ' getting addon worked')
+        addonManager.installAddon(info, (err, folders) => {
+          t.error(err, ' installing addons worked')
+        })
+      })
+    })
+  })
+})
 
+return;
 
 test('wowinterface direct hit', t => {
   t.plan(5)
