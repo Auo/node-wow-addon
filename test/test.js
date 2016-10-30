@@ -47,7 +47,7 @@ test('get category addons from curse', t => {
 })
 
 test('get category addons from wowinterface', t => {
-  t.plan(4)
+  t.plan(5)
   portals['wowinterface'].getCategories((err, categories) => {
     portals['wowinterface'].getAddonsFromCategory(categories[0], (errAddons, addons) => {
       t.error(errAddons, ' get category worked')
@@ -57,6 +57,9 @@ test('get category addons from wowinterface', t => {
         t.error(err, ' getting addon worked')
         addonManager.installAddon(info, (err, folders) => {
           t.error(err, ' installing addons worked')
+            addonManager.deleteAddon(info.name, err => {
+            t.error(err, ' delete worked')
+          })
         })
       })
     })
@@ -80,7 +83,6 @@ test('wowinterface direct hit', t => {
       })
     })
   })
-
 })
 
 test('testing search curse', t => {
@@ -124,13 +126,16 @@ test('delete addon', t => {
 })
 
 test('install .rar addon', t => {
-  t.plan(1)
+  t.plan(2)
   portals['wowinterface'].search('motig', (err, res) => {
     const addon = res.filter(a => { return a.name == '!8ball' })[0]
 
     portals['wowinterface'].getAddonInfo(addon, (err, info) => {
       addonManager.installAddon(info, (err, folders) => {
         t.error(err, ' installing addons worked')
+        addonManager.deleteAddon(info.name,() => {
+          t.error(err, ' deleting ' + info.name + ' worked')
+        })
       })
     })
   })
@@ -221,3 +226,6 @@ test('scan addon folder', t => {
     t.ok(result.unmatched != undefined, ' unmatched addons was defined')
   })
 })
+
+
+

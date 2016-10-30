@@ -83,6 +83,10 @@ module.exports = function(installationPath) {
         }
       }
 
+      if(unknownAddons.length == 0) {
+        return cb(null, { installed, unmatched })
+      }
+
       let addonsSearched = 0
       unknownAddons.forEach(ua => {
         search(ua.tags.Title, (err, searchResults) => {
@@ -304,7 +308,6 @@ module.exports = function(installationPath) {
               try {
                  mkdirp.sync(path.join(installationPath, folders[i]))
               } catch(err) {
-                console.log(err, ' error occured')
                  return cb(err, null) }
             }
 
