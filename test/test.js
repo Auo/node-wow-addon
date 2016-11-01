@@ -36,6 +36,7 @@ test('get category addons from curse', t => {
       t.error(errAddons, ' get category worked')
       t.ok(addons.length > 0, ' alteast one category returned')
 
+
       portals['curse'].getAddonInfo(addons[0], (err, info) => {
         t.error(err, ' getting addon worked')
         addonManager.installAddon(info, (err, folders) => {
