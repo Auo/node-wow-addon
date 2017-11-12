@@ -68,6 +68,7 @@ module.exports = function (installationPath) {
           })
 
         if (!installed.some(c => { return c.name == curseData[i].name && c.link == curseData[i].link && c.version == curseData[i].version })) {
+
           installed.push({
             name: curseData[i].name,
             folders: installPathsForAddon,
@@ -89,7 +90,7 @@ module.exports = function (installationPath) {
       }
 
       unknownAddons = unknownAddons.filter(ua => !!ua.tags.Title)
-      .filter((v, i, a) => a.map(b=>b.tags.Title).indexOf(v.tags.Title) === i);
+        .filter((v, i, a) => a.map(b => b.tags.Title).indexOf(v.tags.Title) === i);
 
       let addonsSearched = 0
       unknownAddons.forEach(ua => {
@@ -201,7 +202,6 @@ module.exports = function (installationPath) {
     const config = jsonfile.readFileSync(path.join(installationPath, 'addons.json'))
 
     const preExisting = config.addons.filter(conf => conf.name === info.name)
-
     const stream = fs.createWriteStream(path.join(installationPath, tempZipName))
 
     request(info.downloadLink)
@@ -227,7 +227,9 @@ module.exports = function (installationPath) {
           })
         } else {
           const index = config.addons.indexOf(preExisting[0])
+
           config.addons[index].portal = info.portal
+          config.addons[index].link = info.link
           config.addons[index].version = info.version
           config.addons[index].folders = folders
         }
@@ -281,6 +283,7 @@ module.exports = function (installationPath) {
         } else {
           const index = config.addons.indexOf(preExisting[0])
           config.addons[index].portal = info.portal
+          config.addons[index].link = info.link
           config.addons[index].version = info.version
           config.addons[index].folders = rootFolders
         }
@@ -331,7 +334,6 @@ module.exports = function (installationPath) {
   }
 
   const checkForAddonUpdate = function checkForUpdate(info, cb) {
-    console.log(info.portal);
     if (portals.availablePortals.indexOf(info.portal) == -1) { return cb(new Error('unspecified or unsupported portal'), null) }
     portals[info.portal].getAddonInfo(info, function (err, addon) {
       if (err) { return cb(err, null) }
