@@ -25,7 +25,6 @@ test('get categories from curse', t => {
   t.plan(2)
   portals['curse'].getCategories((err, categories) => {
     t.error(err, ' get category')
-    //console.log(categories);
     t.ok(categories.length > 0, ' alteast one category returned')
   })
 })
@@ -88,15 +87,15 @@ test('wowinterface direct hit', t => {
   })
 })
 
-// test('testing search curse', t => {
-//   t.plan(3)
+test('testing search curse', t => {
+  t.plan(3)
 
-//   portals['curse'].search('deadly', (err, res) => {
-//     t.ok(res.length > 0, ' atleast some search results were found')
-//     t.error(err, ' no error returned from search')
-//     t.ok(typeof res[0].downloads === 'number' && res[0].downloads > 0, ' downloads is a number that is greater than zero')
-//   })
-// })
+  portals['curse'].search('deadly', (err, res) => {
+    t.ok(res.length > 0, ' atleast some search results were found')
+    t.error(err, ' no error returned from search')
+    t.ok(typeof res[0].downloads === 'number' && res[0].downloads > 0, ' downloads is a number that is greater than zero')
+  })
+})
 
 test('testing search wowinterface', t => {
   t.plan(2)
@@ -145,7 +144,7 @@ test('install .rar addon', t => {
 })
 
 test('get addon information from curse', t => {
-  t.plan(7)
+  t.plan(6)
 
   portals['curse'].search('bagnon', (err, res) => {
     t.ok(typeof res[0].downloads === 'number', 'downloads is a number')
@@ -154,7 +153,7 @@ test('get addon information from curse', t => {
     portals['curse'].getAddonInfo(res[0], (err, info) => {
       t.error(err, ' getting addon worked')
       t.ok(info.version !== null, ' version is defined')
-      t.ok(info.downloadLink.indexOf('.zip') !== -1, ' download link has .zip file')
+      
       addonManager.installAddon(info, (err, folders) => {
         t.error(err, ' installing addons worked')
       })
@@ -192,33 +191,32 @@ test('search for addons that doesnt exist wowinterface', t => {
   })
 })
 
-// test('search for addons that doesnt exist curse', t => {
-//   t.plan(2)
-//   portals['curse'].search('I-dont-think-this-name-exists', (err, res) => {
-//     t.error(err, 'searching for none existing worked')
-//     t.ok(res.length == 0, ' no packages found, good')
-//   })
-// })
+test('search for addons that doesnt exist curse', t => {
+  t.plan(2)
+  portals['curse'].search('I-dont-think-this-name-exists', (err, res) => {
+    t.error(err, 'searching for none existing worked')
+    t.ok(res.length == 0, ' no packages found, good')
+  })
+})
 
-// test('check for updates', t => {
-//   t.plan(2)
+test('check for updates', t => {
+  t.plan(2)
 
-//   portals['curse'].search('bagnon', (err, res) => {
-//     portals['curse'].getAddonInfo(res[0], (err, info) => {
-//       addonManager.installAddon(info, (err, folders) => {
-//         addonManager.listAddons(addons => {
-//           addonManager.checkForAddonUpdate(addons[0], (err, versionInfo) => {
-//             t.error(err, 'check for update didnt crash. good')
-//             addonManager.deleteAddon(info.name, err => {
-//               t.error(err, ' deleting' + info.name + ' worked')
-//             })
-//           })
-//         })
-//       })
-//     })
-//   })
-// })
-
+  portals['curse'].search('bagnon', (err, res) => {
+    portals['curse'].getAddonInfo(res[0], (err, info) => {
+      addonManager.installAddon(info, (err, folders) => {
+        addonManager.listAddons(addons => {
+          addonManager.checkForAddonUpdate(addons[0], (err, versionInfo) => {
+            t.error(err, 'check for update didnt crash. good')
+            addonManager.deleteAddon(info.name, err => {
+              t.error(err, ' deleting' + info.name + ' worked')
+            })
+          })
+        })
+      })
+    })
+  })
+})
 
 test('scan addon folder', t => {
   t.plan(3)
@@ -229,6 +227,3 @@ test('scan addon folder', t => {
     t.ok(result.unmatched != undefined, ' unmatched addons was defined')
   })
 })
-
-
-

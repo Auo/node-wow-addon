@@ -182,9 +182,8 @@ module.exports = function (installationPath) {
   }
 
   const installAddon = function installAddon(info, cb) {
-    console.log(arguments);
     let fileEnding = info.downloadLink.substring(info.downloadLink.lastIndexOf('.'), info.downloadLink.length)
-    
+
     if (fileEnding != '.zip' && fileEnding != '.rar') {
       if (info.portal === 'curse') {
         fileEnding = '.zip'; //assume it's zip
@@ -196,9 +195,7 @@ module.exports = function (installationPath) {
     const tempZipName = sanitize(info.name + '-' + info.version + fileEnding).replace(/ /g, '')
     const config = jsonfile.readFileSync(path.join(installationPath, 'addons.json'))
 
-    const preExisting = config.addons.filter(conf => {
-      return conf.name === info.name
-    })
+    const preExisting = config.addons.filter(conf => conf.name === info.name)
 
     const stream = fs.createWriteStream(path.join(installationPath, tempZipName))
 
@@ -212,8 +209,8 @@ module.exports = function (installationPath) {
         const zip = new AdmZip(path.join(installationPath, tempZipName))
         const zipEntries = zip.getEntries()
 
-        const folders = zipEntries.map(entry => { return entry.entryName.substring(0, entry.entryName.indexOf('/')) })
-          .filter((value, index, self) => { return self.indexOf(value) === index })
+        const folders = zipEntries.map(entry => entry.entryName.substring(0, entry.entryName.indexOf('/')))
+          .filter((value, index, self) => self.indexOf(value) === index)
 
         if (preExisting.length == 0) {
           config.addons.push({
@@ -330,7 +327,6 @@ module.exports = function (installationPath) {
 
   const checkForAddonUpdate = function checkForUpdate(info, cb) {
     if (portals.availablePortals.indexOf(info.portal) == -1) { return cb(new Error('unspecified or unsupported portal'), null) }
-
     portals[info.portal].getAddonInfo(info, function (err, addon) {
       if (err) { return cb(err, null) }
 
