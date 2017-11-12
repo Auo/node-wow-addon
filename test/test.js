@@ -6,6 +6,8 @@ const portals = require('../lib/sources')
 const addonRoot = path.join(__dirname, 'mock')
 const addonManager = addons(addonRoot)
 
+
+
 test('sending null path', t => {
   t.plan(2)
   t.throws(() => addons(null), 'installation path is empty or wrong type')

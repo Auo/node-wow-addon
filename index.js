@@ -42,13 +42,8 @@ module.exports = function (installationPath) {
         return cb(null, { installed: [], unmatched: [] })
       }
 
-      const curseAddons = tocs.filter(toc => {
-        return toc.tags['X-Curse-Project-ID'] != undefined
-      })
-
-      const unknownAddons = tocs.filter(toc => {
-        return toc.tags['X-Curse-Project-ID'] == undefined
-      })
+      const curseAddons = tocs.filter(toc => toc.tags['X-Curse-Project-ID'] != undefined)
+      let unknownAddons = tocs.filter(toc => toc.tags['X-Curse-Project-ID'] == undefined)
 
       const curseData = curseAddons.map(curse => {
         return {
@@ -87,8 +82,21 @@ module.exports = function (installationPath) {
         return cb(null, { installed, unmatched })
       }
 
+      //find all possible titles, dbm hides apparently
+      for (let ua of unknownAddons) {
+        if (!ua.tags.Title) {
+          if (ua.tags['Title|']) { //bug in wow-toc`?
+            ua.tags.Title = ua.tags['Title|']
+          }
+        }
+      }
+
+      unknownAddons = unknownAddons.filter(ua => !!ua.tags.Title)
+      .filter((ua, index, arr) => arr.indexOf(ua) === index);
+      
       let addonsSearched = 0
       unknownAddons.forEach(ua => {
+
         search(ua.tags.Title, (err, searchResults) => {
           addonsSearched++
 
