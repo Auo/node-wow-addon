@@ -30,7 +30,7 @@ test('get categories from curse', t => {
 })
 
 test('get category addons from curse', t => {
-  t.plan(4)
+  t.plan(5)
   portals['curse'].getCategories((err, categories) => {
     
     portals['curse'].getAddonsFromCategory(categories[0], (errAddons, addons) => {
@@ -40,8 +40,12 @@ test('get category addons from curse', t => {
 
       portals['curse'].getAddonInfo(addons[0], (err, info) => {
         t.error(err, ' getting addon worked')
+
         addonManager.installAddon(info, (err, folders) => {
           t.error(err, ' installing addons worked')
+          addonManager.deleteAddon(info.name, err => {
+            t.error(err, ' delete worked')
+          })
         })
       })
     })
@@ -144,7 +148,7 @@ test('install .rar addon', t => {
 })
 
 test('get addon information from curse', t => {
-  t.plan(6)
+  t.plan(7)
 
   portals['curse'].search('bagnon', (err, res) => {
     t.ok(typeof res[0].downloads === 'number', 'downloads is a number')
@@ -156,6 +160,9 @@ test('get addon information from curse', t => {
       
       addonManager.installAddon(info, (err, folders) => {
         t.error(err, ' installing addons worked')
+        addonManager.deleteAddon(info.name, err => {
+          t.error(err, ' delete worked')
+        })
       })
     })
   })
