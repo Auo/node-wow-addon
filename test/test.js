@@ -144,23 +144,23 @@ test('install .rar addon', t => {
   })
 })
 
-// test('get addon information from curse', t => {
-//   t.plan(7)
+test('get addon information from curse', t => {
+  t.plan(7)
 
-//   portals['curse'].search('bagnon', (err, res) => {
-//     t.ok(typeof res[0].downloads === 'number', 'downloads is a number')
-//     t.error(err, ' searching for addone worked')
-//     t.ok(res.length > 0, ' atleast one search result')
-//     portals['curse'].getAddonInfo(res[0], (err, info) => {
-//       t.error(err, ' getting addon worked')
-//       t.ok(info.version !== null, ' version is defined')
-//       t.ok(info.downloadLink.indexOf('.zip') !== -1, ' download link has .zip file')
-//       addonManager.installAddon(info, (err, folders) => {
-//         t.error(err, ' installing addons worked')
-//       })
-//     })
-//   })
-// })
+  portals['curse'].search('bagnon', (err, res) => {
+    t.ok(typeof res[0].downloads === 'number', 'downloads is a number')
+    t.error(err, ' searching for addone worked')
+    t.ok(res.length > 0, ' atleast one search result')
+    portals['curse'].getAddonInfo(res[0], (err, info) => {
+      t.error(err, ' getting addon worked')
+      t.ok(info.version !== null, ' version is defined')
+      t.ok(info.downloadLink.indexOf('.zip') !== -1, ' download link has .zip file')
+      addonManager.installAddon(info, (err, folders) => {
+        t.error(err, ' installing addons worked')
+      })
+    })
+  })
+})
 
 test('get addon information from wowinterface', t => {
   t.plan(8)
