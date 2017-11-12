@@ -30,23 +30,24 @@ test('get categories from curse', t => {
   })
 })
 
-// test('get category addons from curse', t => {
-//   t.plan(4)
-//   portals['curse'].getCategories((err, categories) => {
-//     portals['curse'].getAddonsFromCategory(categories[0], (errAddons, addons) => {
-//       t.error(errAddons, ' get category')
-//       t.ok(addons.length > 0, ' alteast one category returned')
+test('get category addons from curse', t => {
+  t.plan(4)
+  portals['curse'].getCategories((err, categories) => {
+    
+    portals['curse'].getAddonsFromCategory(categories[0], (errAddons, addons) => {
+      t.error(errAddons, ' get category')
+      t.ok(addons.length > 0, ' alteast one category returned')
 
 
-//       portals['curse'].getAddonInfo(addons[0], (err, info) => {
-//         t.error(err, ' getting addon worked')
-//         addonManager.installAddon(info, (err, folders) => {
-//           t.error(err, ' installing addons worked')
-//         })
-//       })
-//     })
-//   })
-// })
+      portals['curse'].getAddonInfo(addons[0], (err, info) => {
+        t.error(err, ' getting addon worked')
+        addonManager.installAddon(info, (err, folders) => {
+          t.error(err, ' installing addons worked')
+        })
+      })
+    })
+  })
+})
 
 test('get category addons from wowinterface', t => {
   t.plan(5)
