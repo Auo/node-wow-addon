@@ -49,7 +49,7 @@ module.exports = function (installationPath) {
         return {
           path: curse.path,
           name: curse.tags['X-Curse-Project-Name'],
-          link: 'https://mods.curse.com/addons/wow/' + curse.tags['X-Curse-Project-ID'],
+          link: 'https://www.curseforge.com/wow/addons/' + curse.tags['X-Curse-Project-ID'],
           version: curse.tags['X-Curse-Packaged-Version']
         }
       })
@@ -82,18 +82,15 @@ module.exports = function (installationPath) {
         return cb(null, { installed, unmatched })
       }
 
-      //find all possible titles, dbm hides apparently
       for (let ua of unknownAddons) {
-        if (!ua.tags.Title) {
-          if (ua.tags['Title|']) { //bug in wow-toc`?
-            ua.tags.Title = ua.tags['Title|']
-          }
+        if (ua.tags.Title) {
+          ua.tags.Title = ua.tags.Title.replace(/(\[(.*?)\])|(\|r)|(\|[a-z0-9]{9})/g, '').trim()
         }
       }
 
       unknownAddons = unknownAddons.filter(ua => !!ua.tags.Title)
-      .filter((ua, index, arr) => arr.indexOf(ua) === index);
-      
+      .filter((v, i, a) => a.map(b=>b.tags.Title).indexOf(v.tags.Title) === i);
+
       let addonsSearched = 0
       unknownAddons.forEach(ua => {
 
@@ -334,6 +331,7 @@ module.exports = function (installationPath) {
   }
 
   const checkForAddonUpdate = function checkForUpdate(info, cb) {
+    console.log(info.portal);
     if (portals.availablePortals.indexOf(info.portal) == -1) { return cb(new Error('unspecified or unsupported portal'), null) }
     portals[info.portal].getAddonInfo(info, function (err, addon) {
       if (err) { return cb(err, null) }

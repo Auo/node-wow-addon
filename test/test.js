@@ -34,7 +34,7 @@ test('get categories from curse', t => {
 test('get category addons from curse', t => {
   t.plan(5)
   portals['curse'].getCategories((err, categories) => {
-    
+
     portals['curse'].getAddonsFromCategory(categories[0], (errAddons, addons) => {
       t.error(errAddons, ' get category')
       t.ok(addons.length > 0, ' alteast one category returned')
@@ -65,7 +65,7 @@ test('get category addons from wowinterface', t => {
         t.error(err, ' getting addon worked')
         addonManager.installAddon(info, (err, folders) => {
           t.error(err, ' installing addons worked')
-            addonManager.deleteAddon(info.name, err => {
+          addonManager.deleteAddon(info.name, err => {
             t.error(err, ' delete worked')
           })
         })
@@ -141,7 +141,7 @@ test('install .rar addon', t => {
     portals['wowinterface'].getAddonInfo(addon, (err, info) => {
       addonManager.installAddon(info, (err, folders) => {
         t.error(err, ' installing addons worked')
-        addonManager.deleteAddon(info.name,() => {
+        addonManager.deleteAddon(info.name, () => {
           t.error(err, ' deleting ' + info.name + ' worked')
         })
       })
@@ -159,7 +159,7 @@ test('get addon information from curse', t => {
     portals['curse'].getAddonInfo(res[0], (err, info) => {
       t.error(err, ' getting addon worked')
       t.ok(info.version !== null, ' version is defined')
-      
+
       addonManager.installAddon(info, (err, folders) => {
         t.error(err, ' installing addons worked')
         addonManager.deleteAddon(info.name, err => {
