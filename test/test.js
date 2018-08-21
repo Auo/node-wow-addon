@@ -99,7 +99,7 @@ test('testing search curse', t => {
   portals['curse'].search('deadly', (err, res) => {
     t.ok(res.length > 0, ' atleast some search results were found')
     t.error(err, ' no error returned from search')
-    t.ok(typeof res[0].downloads === 'number' && res[0].downloads > 0, ' downloads is a number that is greater than zero')
+    t.ok(typeof res[0].downloads === 'number' && res[0].downloads > 2000000, ' downloads is a number that is greater than zero')
   })
 })
 
