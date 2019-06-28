@@ -1,6 +1,6 @@
 {
   "name": "node-wow-addon",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "lists wow addons and information about them",
   "main": "index.js",
   "scripts": {
