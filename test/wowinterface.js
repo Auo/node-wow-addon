@@ -8,11 +8,12 @@ const addonManager = addons(addonRoot)
 const portal = portals['wowinterface']
 
 test('get categories from wowinterface', t => {
-    t.plan(2)
+    t.plan(3)
   
     portal.getCategories((err, categories) => {
       t.error(err, ' get category worked')
       t.ok(categories.length > 0, ' alteast one category returned')
+      t.equals(categories.length, 28)
     })
   })
 
