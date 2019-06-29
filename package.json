@@ -4,7 +4,9 @@
   "description": "lists wow addons and information about them",
   "main": "index.js",
   "scripts": {
-    "test": "tape ./test/*.js"
+    "test": "tape ./test/*.js",
+    "test-curse": "tape ./test/curse.js",
+    "test-wowinterface": "tape ./test/wowinterface.js"
   },
   "author": "Andreas Lindgren",
   "license": "ISC",

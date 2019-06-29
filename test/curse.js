@@ -95,7 +95,7 @@ test('check for updates', t => {
 })
 
 test('getting version from curse', t => {
-  t.plan(2);
+  t.plan(2)
   portal.getAddonInfo({
     name: 'Bagnon',
     link: 'https://www.curseforge.com/wow/addons/bagnon',
@@ -104,4 +104,13 @@ test('getting version from curse', t => {
     t.error(err, 'didnt get an error object');
     t.ok(info.version !== undefined, 'info got a version');
   })
+})
+
+test('parse download count', t => {
+  t.plan(4)
+
+  t.equals(portal._parseDownloads('123'), 123, 'should be able to parse simple numbers')
+  t.equals(portal._parseDownloads('1K'), 1000, 'should be able to parse K')
+  t.equals(portal._parseDownloads('1M'), 1000000, 'should be able to parse M')
+  t.equals(portal._parseDownloads('1.1M'), 1100000, 'should be able to parse decimal with M')
 })
