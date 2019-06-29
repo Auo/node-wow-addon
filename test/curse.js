@@ -9,10 +9,11 @@ const addonManager = addons(addonRoot)
 const portal = portals['curse']
 
 test('get categories from curse', t => {
-  t.plan(2)
+  t.plan(3)
   portal.getCategories((err, categories) => {
     t.error(err, ' get category worked')
     t.ok(categories.length > 0, ' alteast one category returned')
+    t.equals(categories.length, 29)
   })
 })
 
