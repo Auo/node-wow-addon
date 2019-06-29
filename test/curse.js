@@ -37,12 +37,13 @@ test('get category addons from curse', t => {
 })
 
 test('testing search curse', t => {
-  t.plan(3)
+  t.plan(4)
 
   portal.search('deadly', (err, res) => {
     t.ok(res.length > 0, ' atleast some search results were found')
     t.error(err, ' no error returned from search')
     t.ok(typeof res[0].downloads === 'number' && res[0].downloads > 2000000, ' downloads is a number that is greater than zero')
+    t.equals(res[0].name, 'Deadly Boss Mods (DBM)')
   })
 })
 
