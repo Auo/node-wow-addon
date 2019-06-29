@@ -3,24 +3,22 @@ A node-module to install addons for World of Warcraft.
 
 I'm not in any way affiliated with Blizzard or World of Warcraft!
 
-### features
+### Features
 using the portals wowinterface and curse
 * Searching for addons
 * Installing addons
 * Updating addons
 * Scanning current addon folder
 
-
-
-### example code
+### Example
 ```javascript
-const manager = request('node-wow-addon')('path-to-folder-for-installation')
+const manager = request('node-wow-addon')('/path/to/folder/for/installation/of/addons')
 
 manager.portals.availablePortals // Array of available portals to search from, 'wowinterface', 'curse'
-manager.portals.ONEPORTALNAME.search('name', (err, searchResults) => {
+manager.portals['curse'].search('name', (err, searchResults) => {
   //returns an array of search items from specified portal.
   })
-manager.portals.ONEPORTALNAME.getAddonInfo(searchResultItem, (err, info) => {
+manager.portals.['curse'].getAddonInfo(searchResultItem, (err, info) => {
   //takes a search item and retrieves more information
   //you can also take an item from manager.listAddons()
   })
@@ -49,7 +47,6 @@ manager.checkForAddonUpdate(info, (err, versionInfo) => {
 })
 ```
 
-
-
 ### todo
 * Cleanup and restructuring of code
+* Move away from Regex for wowinterface
