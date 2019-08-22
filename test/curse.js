@@ -8,7 +8,7 @@ const addonManager = addons(addonRoot)
 
 const portal = portals['curse']
 
-test('get categories from curse', t => {
+test('get categories', t => {
   t.plan(3)
   portal.getCategories((err, categories) => {
     t.error(err, ' get category worked')
@@ -17,27 +17,59 @@ test('get categories from curse', t => {
   })
 })
 
-test('get category addons from curse', t => {
-  t.plan(5)
-  portal.getCategories((err, categories) => {
-    portal.getAddonsFromCategory(categories[0], (errAddons, addons) => {
-      t.error(errAddons, ' failed to get addons from category')
-      t.ok(addons.length > 0, ' alteast one addon returned')
-      portal.getAddonInfo(addons[0], (err, info) => {
-        t.error(err, ' getting addon worked')
+test('get addons in category', t => {
+  t.plan(2)
+  const category = {
+    "name": 'Chat & Communication',
+    "link": 'https://www.curseforge.com/wow/addons/chat-communication',
+    "subCategories": [],
+    "portal": 'curse'
+  };
 
-        addonManager.installAddon(info, (err, folders) => {
-          t.error(err, ' installing addons worked')
-          addonManager.deleteAddon(info.name, err => {
-            t.error(err, ' delete worked')
-          })
-        })
-      })
+  portal.getAddonsFromCategory(category, (errAddons, addons) => {
+    t.error(errAddons, ' failed to get addons from category')
+    t.ok(addons.length > 0, ' alteast one addon returned')
+  })
+})
+
+test('get info about addon', t => {
+  t.plan(3)
+  const addonFromCategory = {
+    "name": "Raider.IO Mythic Plus and Raid Progress",
+    "link": "https://www.curseforge.com/wow/addons/raiderio",
+    "creator": "",
+    "image": "",
+    "downloads": 55100000,
+    "category": "Chat & Communication",
+    "portal": "curse"
+  }
+
+  portal.getAddonInfo(addonFromCategory, (err, info) => {
+    t.error(err, ' getting addon worked')
+    t.ok(info.downloadLink.startsWith('https://www.curseforge.com/wow/addons/raiderio/download/'))
+    t.equals(info.portal, 'curse')
+  })
+})
+
+test('install and uninstall addon', t => {
+  t.plan(2)
+  const addonInfo = {
+    "name": 'Raider.IO Mythic Plus and Raid Progress',
+    "version": 'v201908220600',
+    "link": 'https://www.curseforge.com/wow/addons/raiderio',
+    "downloadLink": 'https://www.curseforge.com/wow/addons/raiderio/download/2767288/file',
+    "portal": 'curse'
+  }
+
+  addonManager.installAddon(addonInfo, (err, folders) => {
+    t.error(err, ' installing addons worked')
+    addonManager.deleteAddon(addonInfo.name, err => {
+      t.error(err, ' delete worked')
     })
   })
 })
 
-test('testing search curse', t => {
+test('search for addons', t => {
   t.plan(4)
 
   portal.search('deadly', (err, res) => {
@@ -48,28 +80,7 @@ test('testing search curse', t => {
   })
 })
 
-test('get addon information from curse', t => {
-  t.plan(7)
-
-  portal.search('bagnon', (err, res) => {
-    t.ok(typeof res[0].downloads === 'number', 'downloads is a number')
-    t.error(err, ' searching for addon worked')
-    t.ok(res.length > 0, ' atleast one search result')
-    portal.getAddonInfo(res[0], (err, info) => {
-      t.error(err, ' getting addon worked')
-      t.ok(info.version !== null, ' version is defined')
-
-      addonManager.installAddon(info, (err, folders) => {
-        t.error(err, ' installing addons worked')
-        addonManager.deleteAddon(info.name, err => {
-          t.error(err, ' delete worked')
-        })
-      })
-    })
-  })
-})
-
-test('search for addons that doesnt exist curse', t => {
+test('search for addons that doesnt exist', t => {
   t.plan(2)
   portal.search('I-dont-think-this-name-exists', (err, res) => {
     t.error(err, 'searching for none existing worked')
@@ -80,23 +91,27 @@ test('search for addons that doesnt exist curse', t => {
 test('check for updates', t => {
   t.plan(2)
 
-  portal.search('bagnon', (err, res) => {
-    portal.getAddonInfo(res[0], (err, info) => {
-      addonManager.installAddon(info, (err, folders) => {
-        addonManager.listAddons(addons => {
-          addonManager.checkForAddonUpdate(addons[0], (err, versionInfo) => {
-            t.error(err, 'check for update didnt crash. good')
-            addonManager.deleteAddon(info.name, err => {
-              t.error(err, ' deleting ' + info.name + ' worked')
-            })
-          })
+  const addonInfo = {
+    "name": 'Bagnon',
+    "version": '8.2.0',
+    "link": 'https://www.curseforge.com/wow/addons/bagnon',
+    "downloadLink": 'https://www.curseforge.com/wow/addons/bagnon/download/2733373/file',
+    "portal": 'curse'
+  }
+
+  addonManager.installAddon(addonInfo, (err, folders) => {
+    addonManager.listAddons(addons => {
+      addonManager.checkForAddonUpdate(addons[0], (err, versionInfo) => {
+        t.error(err, 'check for update didnt crash. good')
+        addonManager.deleteAddon(addonInfo.name, err => {
+          t.error(err, ' deleting ' + addonInfo.name + ' worked')
         })
       })
     })
   })
 })
 
-test('getting version from curse', t => {
+test('getting addon version', t => {
   t.plan(2)
   portal.getAddonInfo({
     name: 'Bagnon',
