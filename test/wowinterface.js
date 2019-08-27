@@ -13,7 +13,7 @@ test('get categories', t => {
   portal.getCategories((err, categories) => {
     t.error(err, ' get category worked')
     t.ok(categories.length > 0, ' alteast one category returned')
-    t.equals(categories.length, 28)
+    t.equals(categories.length, 52)
   })
 })
 
