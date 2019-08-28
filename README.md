@@ -49,4 +49,3 @@ manager.checkForAddonUpdate(info, (err, versionInfo) => {
 
 ### todo
 * Cleanup and restructuring of code
-* Move away from Regex for wowinterface
