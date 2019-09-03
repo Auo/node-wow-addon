@@ -14,17 +14,18 @@ const glob = require('glob')
 
 
 module.exports = function (installationPath) {
+  const addonsFilePath = path.join(installationPath, 'addons.json');
 
   if (!installationPath || typeof installationPath !== 'string') {
     throw new Error('installation path is empty or wrong type')
   }
 
-  if (!folderExists(path.join(installationPath, 'addons.json'))) {
-    fs.writeFileSync(path.join(installationPath, 'addons.json'), '{"addons":[]}')
+  if (!folderExists(addonsFilePath)) {
+    fs.writeFileSync(addonsFilePath, '{"addons":[]}')
   }
 
   const listAddons = function listAddons(cb) {
-    const config = jsonfile.readFileSync(path.join(installationPath, 'addons.json'))
+    const config = jsonfile.readFileSync(addonsFilePath)
     return cb(config.addons)
   }
 
@@ -101,7 +102,7 @@ module.exports = function (installationPath) {
           if (err == null && searchResults.length > 0) {
             installed.push({
               name: searchResults[0].name,
-              folders: [], //we could add folders, but then we would to have to get detais and download the addon too.
+              folders: [], //we could add folders, but then we would to have to get details and download the addon too.
               link: searchResults[0].link,
               version: '', //same as for folders
               portal: searchResults[0].portal
@@ -121,7 +122,7 @@ module.exports = function (installationPath) {
     })
 
     function addMissingAddons(addons) {
-      const config = jsonfile.readFileSync(path.join(installationPath, 'addons.json'))
+      const config = jsonfile.readFileSync(addonsFilePath)
 
       for (var i = 0; i < addons.length; i++) {
         if (!config.addons.some(conf => { return conf.name == addons[i].name && conf.portal == addons[i].portal })) {
@@ -129,7 +130,7 @@ module.exports = function (installationPath) {
         }
       }
 
-      jsonfile.writeFileSync(path.join(installationPath, 'addons.json'), config)
+      jsonfile.writeFileSync(addonsFilePath, config)
     }
 
     function search(name, cb) {
@@ -149,20 +150,32 @@ module.exports = function (installationPath) {
   }
 
   const deleteAddon = function deleteAddon(name, cb) {
-    const config = jsonfile.readFileSync(path.join(installationPath, 'addons.json'))
+    const config = jsonfile.readFileSync(addonsFilePath)
     const installedAddons = config.addons.filter(conf => { return conf.name == name })
 
     if (installedAddons.length == 0) { return cb(new Error('no addon with that name found in the addons.json file')) }
 
-    const glob = installedAddons[0].folders.length > 1
-      ? '{' + installedAddons[0].folders.map(f => { return path.join(installationPath, f) }).join() + '}'
-      : path.join(installationPath, installedAddons[0].folders[0])
+    const addon = installedAddons[0];
+
+    const index = config.addons.indexOf(addon)
+      
+
+    if (addon.folders.length == 0) {
+      // no installation folders found
+      config.addons.splice(index, 1)
+      jsonfile.writeFileSync(addonsFilePath, config)
+
+      return cb(null)
+    }
+
+    const glob = addon.folders.length > 1
+      ? '{' + addon.folders.map(f => { return path.join(installationPath, f) }).join() + '}'
+      : path.join(installationPath, addon.folders[0])
 
     rimraf(glob, err => {
       if (err) { return cb(err) }
-      const index = config.addons.indexOf(installedAddons[0])
       config.addons.splice(index, 1)
-      jsonfile.writeFileSync(path.join(installationPath, 'addons.json'), config)
+      jsonfile.writeFileSync(addonsFilePath, config)
       return cb(null)
     })
   }
@@ -171,7 +184,7 @@ module.exports = function (installationPath) {
     const addonPath = path.join(installationPath, name)
     if (folderExists(addonPath)) { return cb(new Error('addon folder already exists'), null) }
 
-    const config = jsonfile.readFileSync(path.join(installationPath, 'addons.json'))
+    const config = jsonfile.readFileSync(addonsFilePath)
     config.addons.push({
       name,
       link: null,
@@ -183,7 +196,7 @@ module.exports = function (installationPath) {
     fs.writeFileSync(path.join(addonPath.toString(), name + '.toc'),
       '## Interface: 60200 \n## Title: ' + name + ' \n## Notes: what to do \n## Version: 1.0', 'utf8')
 
-    jsonfile.writeFileSync(path.join(installationPath, 'addons.json'), config)
+    jsonfile.writeFileSync(addonsFilePath, config)
     return cb(null, addonPath)
   }
 
@@ -199,7 +212,7 @@ module.exports = function (installationPath) {
     }
 
     const tempZipName = sanitize(info.name + '-' + info.version + fileEnding).replace(/ /g, '')
-    const config = jsonfile.readFileSync(path.join(installationPath, 'addons.json'))
+    const config = jsonfile.readFileSync(addonsFilePath)
 
     const preExisting = config.addons.filter(conf => conf.name === info.name)
     const stream = fs.createWriteStream(path.join(installationPath, tempZipName))
@@ -234,7 +247,7 @@ module.exports = function (installationPath) {
           config.addons[index].folders = folders
         }
 
-        jsonfile.writeFileSync(path.join(installationPath, 'addons.json'), config)
+        jsonfile.writeFileSync(addonsFilePath, config)
         const foldersToRemove = folders.filter(f => { return folderExists(path.join(installationPath, f)) })
 
         if (foldersToRemove.length > 0) {
@@ -288,7 +301,7 @@ module.exports = function (installationPath) {
           config.addons[index].folders = rootFolders
         }
 
-        jsonfile.writeFileSync(path.join(installationPath, 'addons.json'), config)
+        jsonfile.writeFileSync(addonsFilePath, config)
         const foldersToRemove = folders.filter(f => { return folderExists(path.join(installationPath, f)) })
 
         if (foldersToRemove.length > 0) {

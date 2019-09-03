@@ -6,6 +6,8 @@ const portals = require('../lib/sources')
 const addonRoot = path.join(__dirname, 'mock')
 const addonManager = addons(addonRoot)
 
+const fs = require('fs');
+
 const portal = portals['curse']
 
 test('sending null path', t => {
@@ -33,6 +35,28 @@ test('delete addon', t => {
   t.plan(1)
   addonManager.deleteAddon('dummy', err => {
     t.error(err, 'deleting addon success')
+  })
+})
+
+test('remove addon that wasnt installed properly', t => {
+  t.plan(1)
+
+  const invalidData = {
+    "addons": [
+      {
+        "name": "some-name",
+        "folders": [], // important part. No installed folders.
+        "link": "",
+        "version": "",
+        "portal": "curse"
+      }
+    ]
+  }
+
+  fs.writeFileSync(path.join(addonRoot, 'addons.json'), JSON.stringify(invalidData));
+
+  addonManager.deleteAddon('some-name', err => {
+    t.equal(err, null);
   })
 })
 
