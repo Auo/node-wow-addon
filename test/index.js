@@ -16,14 +16,6 @@ test('sending null path', t => {
   t.throws(() => addons(), 'installation path is empty or wrong type')
 })
 
-test('create dummy addon', t => {
-  t.plan(2)
-  addonManager.createAddon('dummy', (err, addonPath) => {
-    t.error(err, 'addon creation success')
-    t.equals(addonPath, path.join(addonRoot, 'dummy'))
-  })
-})
-
 test('get addons from addons.json', t => {
   t.plan(1)
   addonManager.listAddons(addons => {

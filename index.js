@@ -12,7 +12,6 @@ const unrar = require('unrar-js')
 const mkdirp = require('mkdirp')
 const glob = require('glob')
 
-
 module.exports = function (installationPath) {
   const addonsFilePath = path.join(installationPath, 'addons.json');
 
@@ -20,7 +19,7 @@ module.exports = function (installationPath) {
     throw new Error('installation path is empty or wrong type')
   }
 
-  if (!folderExists(addonsFilePath)) {
+  if (!fileExists(addonsFilePath)) {
     fs.writeFileSync(addonsFilePath, '{"addons":[]}')
   }
 
@@ -158,7 +157,7 @@ module.exports = function (installationPath) {
     const addon = installedAddons[0];
 
     const index = config.addons.indexOf(addon)
-      
+
 
     if (addon.folders.length == 0) {
       // no installation folders found
@@ -178,26 +177,6 @@ module.exports = function (installationPath) {
       jsonfile.writeFileSync(addonsFilePath, config)
       return cb(null)
     })
-  }
-
-  const createAddon = function createAddon(name, cb) {
-    const addonPath = path.join(installationPath, name)
-    if (folderExists(addonPath)) { return cb(new Error('addon folder already exists'), null) }
-
-    const config = jsonfile.readFileSync(addonsFilePath)
-    config.addons.push({
-      name,
-      link: null,
-      folders: [name],
-      portal: null,
-      version: '1.0'
-    })
-    fs.mkdirSync(addonPath)
-    fs.writeFileSync(path.join(addonPath.toString(), name + '.toc'),
-      '## Interface: 60200 \n## Title: ' + name + ' \n## Notes: what to do \n## Version: 1.0', 'utf8')
-
-    jsonfile.writeFileSync(addonsFilePath, config)
-    return cb(null, addonPath)
   }
 
   const installAddon = function installAddon(info, cb) {
@@ -248,7 +227,7 @@ module.exports = function (installationPath) {
         }
 
         jsonfile.writeFileSync(addonsFilePath, config)
-        const foldersToRemove = folders.filter(f => { return folderExists(path.join(installationPath, f)) })
+        const foldersToRemove = folders.filter(f => { return fileExists(path.join(installationPath, f)) })
 
         if (foldersToRemove.length > 0) {
           const glob = foldersToRemove.length > 1 ?
@@ -302,7 +281,7 @@ module.exports = function (installationPath) {
         }
 
         jsonfile.writeFileSync(addonsFilePath, config)
-        const foldersToRemove = folders.filter(f => { return folderExists(path.join(installationPath, f)) })
+        const foldersToRemove = folders.filter(f => { return fileExists(path.join(installationPath, f)) })
 
         if (foldersToRemove.length > 0) {
           const glob = foldersToRemove.length > 1 ?
@@ -359,7 +338,7 @@ module.exports = function (installationPath) {
     })
   }
 
-  function folderExists(path) {
+  function fileExists(path) {
     try {
       fs.accessSync(path, fs.F_OK);
       return true
@@ -370,7 +349,6 @@ module.exports = function (installationPath) {
 
   return {
     listAddons,
-    createAddon,
     deleteAddon,
     installAddon,
     checkForAddonUpdate,

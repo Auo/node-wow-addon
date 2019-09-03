@@ -17,18 +17,14 @@ const manager = request('node-wow-addon')('/path/to/folder/for/installation/of/a
 manager.portals.availablePortals // Array of available portals to search from, 'wowinterface', 'curse'
 manager.portals['curse'].search('name', (err, searchResults) => {
   //returns an array of search items from specified portal.
-  })
+})
 manager.portals.['curse'].getAddonInfo(searchResultItem, (err, info) => {
   //takes a search item and retrieves more information
   //you can also take an item from manager.listAddons()
-  })
+ })
 
 manager.listAddons(addons => {
   //addons is an array  
-})
-
-manager.createAddon('name-of-your-awesome-addon', (err, addonPath) => {
-  //this can be use to create a completely new addon.
 })
 
 manager.installAddon(info, (err, folders) => {
@@ -38,7 +34,7 @@ manager.installAddon(info, (err, folders) => {
 
 manager.deleteAddon('name', err => {
  //tries to uninstall an addon based on its name. if it is not found, and error will be returned
-  })
+ })
 
 manager.checkForAddonUpdate(info, (err, versionInfo) => {
   //info is from the listAddons function.
