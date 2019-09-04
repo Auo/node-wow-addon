@@ -18,15 +18,22 @@ test('sending null path', t => {
 
 test('get addons from addons.json', t => {
   t.plan(1)
+
+  const config = {
+    "addons": [
+      {
+        "name": "some-name",
+        "folders": [],
+        "link": "",
+        "version": "",
+        "portal": "curse"
+      }
+    ]
+  }
+  fs.writeFileSync(path.join(addonRoot, 'addons.json'), JSON.stringify(config));
+
   addonManager.listAddons(addons => {
     t.ok(addons.length >= 1, 'atleast one addon found')
-  })
-})
-
-test('delete addon', t => {
-  t.plan(1)
-  addonManager.deleteAddon('dummy', err => {
-    t.error(err, 'deleting addon success')
   })
 })
 

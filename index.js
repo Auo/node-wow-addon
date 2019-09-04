@@ -5,27 +5,18 @@ const fs = require('fs')
 const rimraf = require('rimraf')
 const request = require('request')
 const AdmZip = require('adm-zip')
-const jsonfile = require('jsonfile')
 const portals = require('./lib/sources')
 const sanitize = require('sanitize-filename')
 const unrar = require('unrar-js')
 const mkdirp = require('mkdirp')
 const glob = require('glob')
+const Config = require('./lib/config')
 
 module.exports = function (installationPath) {
-  const addonsFilePath = path.join(installationPath, 'addons.json');
-
-  if (!installationPath || typeof installationPath !== 'string') {
-    throw new Error('installation path is empty or wrong type')
-  }
-
-  if (!fileExists(addonsFilePath)) {
-    fs.writeFileSync(addonsFilePath, '{"addons":[]}')
-  }
+  const config = new Config(installationPath);
 
   const listAddons = function listAddons(cb) {
-    const config = jsonfile.readFileSync(addonsFilePath)
-    return cb(config.addons)
+    return cb(config.get().addons)
   }
 
   const scanAddonFolder = function scanAddonFolder(cb) {
@@ -121,15 +112,15 @@ module.exports = function (installationPath) {
     })
 
     function addMissingAddons(addons) {
-      const config = jsonfile.readFileSync(addonsFilePath)
+      const cfg = config.get();
 
       for (var i = 0; i < addons.length; i++) {
-        if (!config.addons.some(conf => { return conf.name == addons[i].name && conf.portal == addons[i].portal })) {
-          config.addons.push(addons[i])
+        if (!cfg.addons.some(conf => { return conf.name == addons[i].name && conf.portal == addons[i].portal })) {
+          cfg.addons.push(addons[i])
         }
       }
 
-      jsonfile.writeFileSync(addonsFilePath, config)
+      config.set(cfg);
     }
 
     function search(name, cb) {
@@ -149,20 +140,20 @@ module.exports = function (installationPath) {
   }
 
   const deleteAddon = function deleteAddon(name, cb) {
-    const config = jsonfile.readFileSync(addonsFilePath)
-    const installedAddons = config.addons.filter(conf => { return conf.name == name })
+    const cfg = config.get();
+    const installedAddons = cfg.addons.filter(conf => { return conf.name == name })
 
     if (installedAddons.length == 0) { return cb(new Error('no addon with that name found in the addons.json file')) }
 
     const addon = installedAddons[0];
 
-    const index = config.addons.indexOf(addon)
+    const index = cfg.addons.indexOf(addon)
 
 
     if (addon.folders.length == 0) {
       // no installation folders found
-      config.addons.splice(index, 1)
-      jsonfile.writeFileSync(addonsFilePath, config)
+      cfg.addons.splice(index, 1)
+      config.set(cfg);
 
       return cb(null)
     }
@@ -173,8 +164,8 @@ module.exports = function (installationPath) {
 
     rimraf(glob, err => {
       if (err) { return cb(err) }
-      config.addons.splice(index, 1)
-      jsonfile.writeFileSync(addonsFilePath, config)
+      cfg.addons.splice(index, 1)
+      config.set(cfg);
       return cb(null)
     })
   }
@@ -191,9 +182,9 @@ module.exports = function (installationPath) {
     }
 
     const tempZipName = sanitize(info.name + '-' + info.version + fileEnding).replace(/ /g, '')
-    const config = jsonfile.readFileSync(addonsFilePath)
+    const cfg = config.get();
 
-    const preExisting = config.addons.filter(conf => conf.name === info.name)
+    const preExisting = cfg.addons.filter(conf => conf.name === info.name)
     const stream = fs.createWriteStream(path.join(installationPath, tempZipName))
 
     request(info.downloadLink)
@@ -210,7 +201,7 @@ module.exports = function (installationPath) {
           .filter((value, index, self) => self.indexOf(value) === index)
 
         if (preExisting.length == 0) {
-          config.addons.push({
+          cfg.addons.push({
             name: info.name,
             link: info.link,
             folders,
@@ -218,15 +209,16 @@ module.exports = function (installationPath) {
             version: info.version
           })
         } else {
-          const index = config.addons.indexOf(preExisting[0])
+          const index = cfg.addons.indexOf(preExisting[0]);
+          
 
-          config.addons[index].portal = info.portal
-          config.addons[index].link = info.link
-          config.addons[index].version = info.version
-          config.addons[index].folders = folders
+          cfg.addons[index].portal = info.portal
+          cfg.addons[index].link = info.link
+          cfg.addons[index].version = info.version
+          cfg.addons[index].folders = folders
         }
 
-        jsonfile.writeFileSync(addonsFilePath, config)
+        config.set(cfg);
         const foldersToRemove = folders.filter(f => { return fileExists(path.join(installationPath, f)) })
 
         if (foldersToRemove.length > 0) {
@@ -265,7 +257,7 @@ module.exports = function (installationPath) {
           .filter((value, index, self) => { return self.indexOf(value) === index })
 
         if (preExisting.length == 0) {
-          config.addons.push({
+          cfg.addons.push({
             name: info.name,
             link: info.link,
             folders: rootFolders,
@@ -273,14 +265,14 @@ module.exports = function (installationPath) {
             version: info.version
           })
         } else {
-          const index = config.addons.indexOf(preExisting[0])
-          config.addons[index].portal = info.portal
-          config.addons[index].link = info.link
-          config.addons[index].version = info.version
-          config.addons[index].folders = rootFolders
+          const index = cfg.addons.indexOf(preExisting[0])
+          cfg.addons[index].portal = info.portal
+          cfg.addons[index].link = info.link
+          cfg.addons[index].version = info.version
+          cfg.addons[index].folders = rootFolders
         }
 
-        jsonfile.writeFileSync(addonsFilePath, config)
+        config.set(cfg);
         const foldersToRemove = folders.filter(f => { return fileExists(path.join(installationPath, f)) })
 
         if (foldersToRemove.length > 0) {
