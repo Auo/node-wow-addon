@@ -21,16 +21,15 @@ module.exports = function (installationPath) {
 
   const deleteAddon = function deleteAddon(name, cb) {
     const cfg = config.get();
-    const installedAddons = cfg.addons.filter(conf => { return conf.name == name })
+    const ix = cfg.addons.findIndex(conf => conf.name == name)
 
-    if (installedAddons.length == 0) { return cb(new Error('no addon with that name found in the addons.json file')) }
+    if (ix == -1) { return cb(new Error('no addon with that name found in the addons.json file')) }
 
-    const addon = installedAddons[0];
-    const index = cfg.addons.indexOf(addon)
+    const addon = cfg.addons[ix]
 
     if (addon.folders.length == 0) {
       // no installation folders found
-      cfg.addons.splice(index, 1)
+      cfg.addons.splice(ix, 1)
       config.set(cfg);
 
       return cb(null)
@@ -40,7 +39,7 @@ module.exports = function (installationPath) {
 
     rimraf(pattern, err => {
       if (err) { return cb(err) }
-      cfg.addons.splice(index, 1)
+      cfg.addons.splice(ix, 1)
       config.set(cfg);
       return cb(null)
     })
