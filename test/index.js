@@ -16,7 +16,7 @@ test('sending null path', t => {
   t.throws(() => addons(), 'installation path is empty or wrong type')
 })
 
-test('get addons from addons.json', t => {
+test('list addons', t => {
   t.plan(1)
 
   const config = {
@@ -33,7 +33,8 @@ test('get addons from addons.json', t => {
   fs.writeFileSync(path.join(addonRoot, 'addons.json'), JSON.stringify(config));
 
   addonManager.listAddons(addons => {
-    t.ok(addons.length >= 1, 'atleast one addon found')
+    t.equal(addons.length, 1)
+    t.equal(addons[0].name, 'some-name');
   })
 })
 
@@ -51,6 +52,7 @@ test('remove addon that wasnt installed properly', t => {
       }
     ]
   }
+
 
   fs.writeFileSync(path.join(addonRoot, 'addons.json'), JSON.stringify(invalidData));
 
