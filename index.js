@@ -1,5 +1,4 @@
 'use strict'
-const wowtoc = require('wow-toc')
 const path = require('path')
 const fs = require('fs')
 const rimraf = require('rimraf')
@@ -9,134 +8,19 @@ const portals = require('./lib/sources')
 const sanitize = require('sanitize-filename')
 const unrar = require('unrar-js')
 const mkdirp = require('mkdirp')
-const glob = require('glob')
 const Config = require('./lib/config')
+const ProjectScanner = require('./lib/project-scanner')
 
 module.exports = function (installationPath) {
   const config = new Config(installationPath);
+  const scanner = new ProjectScanner(installationPath);
 
   const listAddons = function listAddons(cb) {
     return cb(config.get().addons)
   }
 
   const scanAddonFolder = function scanAddonFolder(cb) {
-    glob(installationPath + '/*/*.toc', (err, files) => {
-      //{tags:{}, files:[]}
-      const tocs = files.map(file => {
-        const content = fs.readFileSync(file, 'utf8')
-        const addonInfo = wowtoc.parse(content)
-        addonInfo.path = file
-        return addonInfo
-      })
-
-      if (tocs.length == 0) {
-        return cb(null, { installed: [], unmatched: [] })
-      }
-
-      const curseAddons = tocs.filter(toc => toc.tags['X-Curse-Project-ID'] != undefined)
-      let unknownAddons = tocs.filter(toc => toc.tags['X-Curse-Project-ID'] == undefined)
-
-      const curseData = curseAddons.map(curse => {
-        return {
-          path: curse.path,
-          name: curse.tags['X-Curse-Project-Name'],
-          link: 'https://www.curseforge.com/wow/addons/' + curse.tags['X-Curse-Project-ID'],
-          version: curse.tags['X-Curse-Packaged-Version']
-        }
-      })
-
-      const installed = []
-      const unmatched = []
-
-      for (var i = 0; i < curseData.length; i++) {
-        const installPathsForAddon = curseData.filter(c => { return c.name == curseData[i].name && c.link == curseData[i].link && c.version == curseData[i].version })
-          .map(c => { return c.path })
-          .filter((value, index, self) => { return self.indexOf(value) === index })
-          .map(p => {
-            const withoutFile = path.dirname(p)
-            const folderName = withoutFile.substring(withoutFile.lastIndexOf('/') + 1, withoutFile.length)
-            return folderName
-          })
-
-        if (!installed.some(c => { return c.name == curseData[i].name && c.link == curseData[i].link && c.version == curseData[i].version })) {
-
-          installed.push({
-            name: curseData[i].name,
-            folders: installPathsForAddon,
-            link: curseData[i].link,
-            version: curseData[i].version,
-            portal: 'curse'
-          })
-        }
-      }
-
-      if (unknownAddons.length == 0) {
-        return cb(null, { installed, unmatched })
-      }
-
-      for (let ua of unknownAddons) {
-        if (ua.tags.Title) {
-          ua.tags.Title = ua.tags.Title.replace(/(\[(.*?)\])|(\|r)|(\|[a-z0-9]{9})/g, '').trim()
-        }
-      }
-
-      unknownAddons = unknownAddons.filter(ua => !!ua.tags.Title)
-        .filter((v, i, a) => a.map(b => b.tags.Title).indexOf(v.tags.Title) === i);
-
-      let addonsSearched = 0
-      unknownAddons.forEach(ua => {
-
-        search(ua.tags.Title, (err, searchResults) => {
-          addonsSearched++
-
-          if (err == null && searchResults.length > 0) {
-            installed.push({
-              name: searchResults[0].name,
-              folders: [], //we could add folders, but then we would to have to get details and download the addon too.
-              link: searchResults[0].link,
-              version: '', //same as for folders
-              portal: searchResults[0].portal
-            })
-          } else {
-            unmatched.push({
-              name: ua.tags.Title
-            })
-          }
-
-          if (addonsSearched == unknownAddons.length) {
-            addMissingAddons(installed)
-            return cb(null, { installed, unmatched })
-          }
-        })
-      })
-    })
-
-    function addMissingAddons(addons) {
-      const cfg = config.get();
-
-      for (var i = 0; i < addons.length; i++) {
-        if (!cfg.addons.some(conf => { return conf.name == addons[i].name && conf.portal == addons[i].portal })) {
-          cfg.addons.push(addons[i])
-        }
-      }
-
-      config.set(cfg);
-    }
-
-    function search(name, cb) {
-      const p = portals.availablePortals
-      let results = []
-      let completedSearches = 0
-
-      for (let i = 0; i < p.length; i++) {
-        portals[p[i]].search(name, (err, addons) => {
-          if (err) { return cb(err, null) }
-          completedSearches++
-          if (addons != null) { results = results.concat(addons) }
-          if (completedSearches == p.length) { return cb(null, results.sort((a, b) => { return b.downloads - a.downloads })) }
-        })
-      }
-    }
+    scanner.scan(cb)
   }
 
   const deleteAddon = function deleteAddon(name, cb) {
@@ -146,9 +30,7 @@ module.exports = function (installationPath) {
     if (installedAddons.length == 0) { return cb(new Error('no addon with that name found in the addons.json file')) }
 
     const addon = installedAddons[0];
-
     const index = cfg.addons.indexOf(addon)
-
 
     if (addon.folders.length == 0) {
       // no installation folders found
@@ -158,11 +40,9 @@ module.exports = function (installationPath) {
       return cb(null)
     }
 
-    const glob = addon.folders.length > 1
-      ? '{' + addon.folders.map(f => { return path.join(installationPath, f) }).join() + '}'
-      : path.join(installationPath, addon.folders[0])
+    const pattern = '{' + addon.folders.map(f => { return path.join(installationPath, f) }).join() + '}'
 
-    rimraf(glob, err => {
+    rimraf(pattern, err => {
       if (err) { return cb(err) }
       cfg.addons.splice(index, 1)
       config.set(cfg);
@@ -210,7 +90,6 @@ module.exports = function (installationPath) {
           })
         } else {
           const index = cfg.addons.indexOf(preExisting[0]);
-          
 
           cfg.addons[index].portal = info.portal
           cfg.addons[index].link = info.link
@@ -222,12 +101,9 @@ module.exports = function (installationPath) {
         const foldersToRemove = folders.filter(f => { return fileExists(path.join(installationPath, f)) })
 
         if (foldersToRemove.length > 0) {
-          const glob = foldersToRemove.length > 1 ?
-            '{' + foldersToRemove.map(f => { return path.join(installationPath, f) }).join() + '}'
-            : path.join(installationPath, foldersToRemove[0])
+          const pattern = '{' + foldersToRemove.map(f => { return path.join(installationPath, f) }).join() + '}'
 
-
-          rimraf(glob, (err) => {
+          rimraf(pattern, (err) => {
             if (err) { return cb(err, null) }
 
             zip.extractAllTo(installationPath)
@@ -276,12 +152,9 @@ module.exports = function (installationPath) {
         const foldersToRemove = folders.filter(f => { return fileExists(path.join(installationPath, f)) })
 
         if (foldersToRemove.length > 0) {
-          const glob = foldersToRemove.length > 1 ?
-            '{' + foldersToRemove.map(f => { return path.join(installationPath, f) }).join() + '}'
-            : path.join(installationPath, foldersToRemove[0])
+          const pattern = '{' + foldersToRemove.map(f => { return path.join(installationPath, f) }).join() + '}'
 
-
-          rimraf(glob, (err) => {
+          rimraf(pattern, (err) => {
             if (err) { return cb(err, null) }
 
             for (let i = 0; i < folders.length; i++) {
