@@ -17,7 +17,7 @@ test('sending null path', t => {
 })
 
 test('list addons', t => {
-  t.plan(1)
+  t.plan(2)
 
   const config = {
     "addons": [
