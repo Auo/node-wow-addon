@@ -1,7 +1,7 @@
 {
   "name": "node-wow-addon",
   "version": "1.0.6",
-  "description": "lists wow addons and information about them",
+  "description": "Search, list, install World of Warcraft addons",
   "main": "index.js",
   "scripts": {
     "test": "tape ./test/*.js",
@@ -16,7 +16,7 @@
     "cloudscraper": "^4.1.3",
     "entities": "^1.1.1",
     "glob": "^7.0.6",
-    "jsonfile": "^2.3.1",
+    "jsonfile": "^5.0.0",
     "mkdirp": "^0.5.1",
     "request": "^2.74.0",
     "rimraf": "^2.5.4",

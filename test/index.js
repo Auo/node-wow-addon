@@ -16,25 +16,25 @@ test('sending null path', t => {
   t.throws(() => addons(), 'installation path is empty or wrong type')
 })
 
-test('create dummy addon', t => {
+test('list addons', t => {
   t.plan(2)
-  addonManager.createAddon('dummy', (err, addonPath) => {
-    t.error(err, 'addon creation success')
-    t.equals(addonPath, path.join(addonRoot, 'dummy'))
-  })
-})
 
-test('get addons from addons.json', t => {
-  t.plan(1)
+  const config = {
+    "addons": [
+      {
+        "name": "some-name",
+        "folders": [],
+        "link": "",
+        "version": "",
+        "portal": "curse"
+      }
+    ]
+  }
+  fs.writeFileSync(path.join(addonRoot, 'addons.json'), JSON.stringify(config));
+
   addonManager.listAddons(addons => {
-    t.ok(addons.length >= 1, 'atleast one addon found')
-  })
-})
-
-test('delete addon', t => {
-  t.plan(1)
-  addonManager.deleteAddon('dummy', err => {
-    t.error(err, 'deleting addon success')
+    t.equal(addons.length, 1)
+    t.equal(addons[0].name, 'some-name');
   })
 })
 
@@ -52,6 +52,7 @@ test('remove addon that wasnt installed properly', t => {
       }
     ]
   }
+
 
   fs.writeFileSync(path.join(addonRoot, 'addons.json'), JSON.stringify(invalidData));
 
