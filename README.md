@@ -1,4 +1,5 @@
 ## node-wow-addon
+**I'm not currently not activly maintaining this project due to lack of time**
 A node-module to install addons for World of Warcraft.
 
 I'm not in any way affiliated with Blizzard or World of Warcraft!
